@@ -18,6 +18,11 @@ int main()
     /* READ A CSV, escaping is supported */
     Parsed parsed_csv = dsvParseFile(filepath, delim);
 
+    /* failed to parse! Always check is valid */
+    if (!parsed_csv.valid) {
+        fprintf(stderr,"failed to parse csv\n");
+    }
+
     /* inbuilt print function */
     printParsed(parsed_csv);
 
