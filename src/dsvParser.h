@@ -56,54 +56,153 @@ void printParsed(Parsed parsed) {
     }
 }
 
+char*** allocateContents(size_t rows, size_t cols, size_t strings_len) {
+    char*** p = (char***)malloc(sizeof(char**) * rows);
+    if (!p) {
+        fprintf(stderr, "PARSE_ERR: Unable to allocate memory for rows\n");
+        return NULL; // Return an invalid Parsed struct
+    }
+    for (size_t x = 0; x < rows; x++) {
+        p[x] = (char**)malloc(sizeof(char*) * cols); /* over estimate size for cols (and values) */
+        if (!p[x]) {
+            fprintf(stderr, "PARSE_ERR: Unable to allocate memory for cols\n");
+            // Free previously allocated memory
+            for (size_t i = 0; i < x; i++) {
+                for (size_t j = 0; j < cols; j++) {
+                    free(p[i][j]);
+                }
+                free(p[i]);
+            }
+            free(p);
+            return NULL; 
+        }
+        for (size_t y = 0; y < cols; y++) {
+            p[x][y] = (char*)malloc(sizeof(char) * strings_len); /* over estimate size for strings */
+            if (!p[x][y]) {
+                fprintf(stderr, "PARSE_ERR: Unable to allocate memory for strings\n");
+                // Free previously allocated memory
+                for (size_t i = 0; i <= x; i++) {
+                    for (size_t j = 0; j < y; j++) {
+                        free(p[i][j]);
+                    }
+                    free(p[i]);
+                }
+                free(p);
+                return NULL;
+            }
+        }
+    }
+    return p;
+}
+
+char*** reallocContents(char*** p, size_t old_rows, size_t old_cols, size_t new_rows, size_t new_cols, size_t strings_len) {
+    // Reallocate memory for rows
+    char*** tmp = (char***)realloc(p, sizeof(char**) * new_rows);
+    if (!tmp) {
+        fprintf(stderr, "PARSE_ERR: Unable to reallocate memory for rows\n");
+        return NULL;
+    }
+    p = tmp;
+
+    // Reallocate memory for columns and strings
+    for (size_t x = 0; x < old_rows; x++) {
+        // Reallocate memory for columns
+        char** tmpC = (char**)realloc(p[x], sizeof(char*) * new_cols);
+        if (!tmpC) {
+            fprintf(stderr, "PARSE_ERR: Unable to reallocate memory for cols\n");
+            // Free previously allocated memory
+            for (size_t i = 0; i < x; i++) {
+                free(p[i]);
+            }
+            free(p);
+            return NULL;
+        }
+        p[x] = tmpC;
+
+        // Reallocate memory for strings
+        for (size_t y = 0; y < old_cols; y++) {
+            char* tmpS = (char*)realloc(p[x][y], sizeof(char) * strings_len);
+            if (!tmpS) {
+                fprintf(stderr, "PARSE_ERR: Unable to reallocate memory for strings\n");
+                // Free previously allocated memory
+                for (size_t i = 0; i <= x; i++) {
+                    for (size_t j = 0; j < y; j++) {
+                        free(p[i][j]);
+                    }
+                    free(p[i]);
+                }
+                free(p);
+                return NULL;
+            }
+            p[x][y] = tmpS;
+        }
+
+        // Allocate memory for additional columns and strings (if needed)
+        for (size_t y = old_cols; y < new_cols; y++) {
+            p[x][y] = (char*)malloc(sizeof(char) * strings_len);
+            if (!p[x][y]) {
+                fprintf(stderr, "PARSE_ERR: Unable to allocate memory for strings\n");
+                // Free previously allocated memory
+                for (size_t i = 0; i <= x; i++) {
+                    for (size_t j = 0; j < y; j++) {
+                        free(p[i][j]);
+                    }
+                    free(p[i]);
+                }
+                free(p);
+                return NULL;
+            }
+        }
+    }
+
+    // Allocate memory for additional rows, columns, and strings (if needed)
+    for (size_t x = old_rows; x < new_rows; x++) {
+        p[x] = (char**)malloc(sizeof(char*) * new_cols);
+        if (!p[x]) {
+            fprintf(stderr, "PARSE_ERR: Unable to allocate memory for cols\n");
+            // Free previously allocated memory
+            for (size_t i = 0; i < x; i++) {
+                free(p[i]);
+            }
+            free(p);
+            return NULL;
+        }
+
+        for (size_t y = 0; y < new_cols; y++) {
+            p[x][y] = (char*)malloc(sizeof(char) * strings_len);
+            if (!p[x][y]) {
+                fprintf(stderr, "PARSE_ERR: Unable to allocate memory for strings\n");
+                // Free previously allocated memory
+                for (size_t i = 0; i <= x; i++) {
+                    for (size_t j = 0; j < y; j++) {
+                        free(p[i][j]);
+                    }
+                    free(p[i]);
+                }
+                free(p);
+                return NULL;
+            }
+        }
+    }
+
+    return p;
+}
+
 
 Parsed parse_source(char* source, size_t size, char delim) {
 
     size_t cur = 0;
 
-    size_t rows_est = 5;
-    size_t cols_est = 6;
-    size_t strings_len_est = 100;
+    size_t rows_est = 1;
+    size_t cols_est = 1;
+    size_t strings_len_est = 1;
     Parsed returnVal = { NULL, 0, 0, false };
 
-    returnVal.content = (char***)malloc(sizeof(char**) * rows_est);
-    if (!returnVal.content) {
-        fprintf(stderr, "PARSE_ERR: Unable to allocate memory for rows\n");
-        return returnVal; // Return an invalid Parsed struct
-    }
-    for (size_t x = 0; x < rows_est; x++) {
-        returnVal.content[x] = (char**)malloc(sizeof(char*) * cols_est); /* over estimate size for cols (and values) */
-        if (!returnVal.content[x]) {
-            fprintf(stderr, "PARSE_ERR: Unable to allocate memory for cols\n");
-            // Free previously allocated memory
-            for (size_t i = 0; i < x; i++) {
-                for (size_t j = 0; j < cols_est; j++) {
-                    free(returnVal.content[i][j]);
-                }
-                free(returnVal.content[i]);
-            }
-            free(returnVal.content);
-            return returnVal; 
-        }
-        for (size_t y = 0; y < cols_est; y++) {
-            returnVal.content[x][y] = (char*)malloc(sizeof(char) * strings_len_est); /* over estimate size for strings */
-            if (!returnVal.content[x][y]) {
-                fprintf(stderr, "PARSE_ERR: Unable to allocate memory for strings\n");
-                // Free previously allocated memory
-                for (size_t i = 0; i <= x; i++) {
-                    for (size_t j = 0; j < y; j++) {
-                        free(returnVal.content[i][j]);
-                    }
-                    free(returnVal.content[i]);
-                }
-                free(returnVal.content);
-                return returnVal;
-            }
-        }
+    returnVal.content = allocateContents(rows_est, cols_est, strings_len_est);
+    if (returnVal.content == NULL) {
+        /* failed to allocate */
     }
 
-    // At this point, returnVal.content is successfully allocated
-    // Your code goes here
 
 
 
@@ -115,11 +214,37 @@ Parsed parse_source(char* source, size_t size, char delim) {
     size_t cols = 0;
 
     for (size_t i = 0; i < size; i++) {
+        printf("x: %zu, y: %zu, cur: %zu | rows_est: %zu, cols_est: %zu, strings_len_est: %zu\n",x,y,cur,rows_est,cols_est,strings_len_est);
+        /* if any of the variables exceed their estimate, reallocate */
+        if (x >= rows_est || y >= cols_est || cur >= strings_len_est) {
+            size_t new_rows_est = rows_est;
+            size_t new_cols_est = cols_est;
+            size_t new_strings_len_est = strings_len_est;
+
+            // Update estimation variables if exceeded
+            if (x >= rows_est) new_rows_est *= 2;
+            if (y >= cols_est) new_cols_est *= 2;
+            if (cur >= strings_len_est) new_strings_len_est *= 2;
+
+            // Reallocate contents
+            char*** tmp = reallocContents(returnVal.content, rows_est, cols_est, new_rows_est, new_cols_est, new_strings_len_est);
+            if (!tmp) {
+                // Reallocation failed, handle error
+                fprintf(stderr, "PARSE_ERR: Unable to reallocate memory for contents\n");
+                return returnVal;
+            }
+
+            // Update variables with new estimates
+            returnVal.content = tmp;
+            rows_est = new_rows_est;
+            cols_est = new_cols_est;
+            strings_len_est = new_strings_len_est;
+        }
         char current_char = source[i];
 
         if (current_char == '"') {
             escaping = !escaping;
-            }
+        }
         else if (current_char == delim && !escaping) {
             returnVal.content[x][y][cur] = '\0';
             y++;
