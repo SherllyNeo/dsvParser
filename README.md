@@ -35,7 +35,7 @@ typedef struct {
 * Delete row
 * print DSV
 * Easy to free using the dsvFreeDSV function using the dsvFreeDSV function
-* Each function returns an int value where 0 means success or a DSV struct that may be valid
+* Most functions returns an int value where 0 means success or a DSV struct that may be valid
 
 
 ### Functions
@@ -62,7 +62,7 @@ void dsvPrintDSV(DSV parsed);
 ```
 
 ```c
-void dsvFreeDSV(DSV parsed);
+int dsvFreeDSV(DSV parsed);
 ```
 
 

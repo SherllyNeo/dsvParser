@@ -76,7 +76,10 @@ int main()
     }
     
     /* always free */
-    dsvFreeDSV(parsed_csv);
+    int freed = dsvFreeDSV(parsed_csv);
+    if (freed) {
+        fprintf(stderr,"failed to free\n");
+    }
 
 
     return EXIT_SUCCESS;

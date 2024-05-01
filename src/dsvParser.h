@@ -378,7 +378,7 @@ void dsvPrintDSV(DSV parsed) {
     }
 }
 
-void dsvFreeDSV(DSV parsed) {
+int dsvFreeDSV(DSV parsed) {
     /* always free */
     for (size_t i = 0; i < parsed.rows; i++) {
         for (size_t j = 0; j < parsed.cols; j++) {
@@ -393,6 +393,7 @@ void dsvFreeDSV(DSV parsed) {
     if (parsed.content) {
         free(parsed.content);
     }
+    return 0;
 }
 
 
@@ -420,7 +421,7 @@ DSV dsvParseFile(char* filepath, char delim) {
     return returnVal;
 }
 
-size_t dsvWriteFile(DSV parsed,char* filepath,char delim) {
+int dsvWriteFile(DSV parsed,char* filepath,char delim) {
     /* write DSV object to file */
     FILE* fp = fopen(filepath,"w");
     if (!fp) {
