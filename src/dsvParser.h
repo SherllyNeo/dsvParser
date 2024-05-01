@@ -342,6 +342,30 @@ int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position) {
     return 0;
 }
 
+int dsvRemoveRow(DSV *dsv, size_t position) {
+
+    /* insure position is in dsv */
+    if (position < 0 || position > dsv->rows) {
+        fprintf(stderr,"DSV_USR_ERR: position to try and delete row is out of bounds\n");
+        return 1;
+    }
+     /* Free memory for the row being removed */
+    for (size_t i = 0; i < dsv->cols; i++) {
+        free(dsv->content[position][i]);
+    }
+    free(dsv->content[position]);
+
+    /* Shift subsequent rows up */
+    for (size_t i = position; i < dsv->rows - 1; i++) {
+        dsv->content[i] = dsv->content[i + 1];
+    }
+
+    /* Decrement the row count */
+    dsv->rows--;
+
+    return 0;
+}
+
 
 void dsvPrintDSV(DSV parsed) {
     /* helper function to print parsed */
@@ -359,7 +383,6 @@ void dsvFreeDSV(DSV parsed) {
     for (size_t i = 0; i < parsed.rows; i++) {
         for (size_t j = 0; j < parsed.cols; j++) {
             if (parsed.content[i][j]) {
-                printf("%s\n",parsed.content[i][j]);
                 free(parsed.content[i][j]);
             }
         }

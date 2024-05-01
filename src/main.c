@@ -12,6 +12,8 @@
 
 int main()
 {
+
+
     char* filepath = "./test.csv";
     /* can be anything other than " or \n */
     char delim = ',';
@@ -42,7 +44,10 @@ int main()
     
     size_t insert_index = 1; /* ensure not out of bounds */
 
-    dsvInsertRow(&parsed_csv,row,insert_index);
+    int result_insert = dsvInsertRow(&parsed_csv,row,insert_index);
+    if (result_insert) {
+        fprintf(stderr,"failed to add new row\n");
+    }
 
 
     /* inbuilt print function */
@@ -50,11 +55,18 @@ int main()
 
     /* write to a fie, you can choose the path and delimiter. Will always ""
      * wrap each value*/
-    int result = dsvWriteFile(parsed_csv,"./test1.csv",';');
-    if (result) {
+    int result_write = dsvWriteFile(parsed_csv,"./test1.csv",';');
+    if (result_write) {
         fprintf(stderr,"failed to write to file\n");
     }
 
+    /* remove a row */
+    int result_remove = dsvRemoveRow(&parsed_csv,0);
+    if (result_remove) {
+        fprintf(stderr,"failed to remove\n");
+    }
+
+    printf("\n\n");
     /* access elements directly */
     for (size_t i = 0; i<parsed_csv.rows; i++) {
         for (size_t j = 0; j<parsed_csv.cols; j++) {
