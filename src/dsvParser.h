@@ -283,6 +283,9 @@ DSV parse_source(char* source, size_t size, char delim) {
 /* PUBLIC FUNCTIONS */
 
 int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position) {
+
+    size_t max_size_of_string_in_tmp_row = max_string_length(tmp_row);
+
     /* insure position is in dsv */
     if (position < 0 || position > dsv->rows) {
         fprintf(stderr,"DSV_USR_ERR: position to try and insert row is out of bounds\n");
@@ -295,7 +298,22 @@ int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position) {
         fprintf(stderr, "DSV_ALLOC_ERR: Unable to allocate memory for row\n");
         return 1;
     }
-    memcpy(row,tmp_row,sizeof(char*) * dsv->cols);
+
+    for (size_t i = 0; i<dsv->cols; i++) {
+        row[i] = (char*)malloc(sizeof(char*)*max_size_of_string_in_tmp_row);
+        if (!row[i]) {
+            fprintf(stderr, "DSV_ALLOC_ERR: Unable to allocate memory for row[%zu]\n", i);
+            /* free old mem */
+            for (size_t j = 0; j < i; j++) {
+                free(row[j]);
+            }
+            free(row);
+            return 1;
+        }
+        strncpy(row[i], tmp_row[i],max_size_of_string_in_tmp_row); 
+        row[i][max_size_of_string_in_tmp_row] = '\0';
+    }
+
     free(tmp_row);
 
     /* null terminate new */
@@ -341,6 +359,7 @@ void dsvFreeDSV(DSV parsed) {
     for (size_t i = 0; i < parsed.rows; i++) {
         for (size_t j = 0; j < parsed.cols; j++) {
             if (parsed.content[i][j]) {
+                printf("%s\n",parsed.content[i][j]);
                 free(parsed.content[i][j]);
             }
         }
