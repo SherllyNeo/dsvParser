@@ -89,6 +89,7 @@ char*** allocateContents(size_t rows, size_t cols, size_t strings_len) {
 }
 
 size_t max_string_length(char** strings) {
+    /* helper function to find the max size to allocate in an array */
     size_t max_length = 0;
 
     for (size_t i = 0; strings[i] != NULL; i++) {
@@ -127,7 +128,7 @@ char*** reallocContents(char*** p, size_t old_rows, size_t old_cols, size_t new_
             char* tmpS = (char*)realloc(p[x][y], sizeof(char) * strings_len);
             if (!tmpS) {
                 fprintf(stderr, "DSV_ALLOC_ERR: Unable to reallocate memory for strings\n");
-                // Free previously allocated memory
+                /* free old memory */
                 for (size_t i = 0; i <= x; i++) {
                     for (size_t j = 0; j < y; j++) {
                         free(p[i][j]);
@@ -189,10 +190,10 @@ char*** reallocContents(char*** p, size_t old_rows, size_t old_cols, size_t new_
 
 
 DSV parse_source(char* source, size_t size, char delim) {
-
+    /* the most useful function, reads in a CSV and parses it */
 
     /* assumptions of typical csv sizes */
-    size_t rows_est = 10;
+    size_t rows_est = 100;
     size_t cols_est = 10;
     size_t strings_len_est = 200;
     DSV returnVal = { NULL, 0, 0, false };
@@ -286,8 +287,8 @@ int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position) {
 
     size_t max_size_of_string_in_tmp_row = max_string_length(tmp_row);
 
-    /* insure position is in dsv */
-    if (position < 0 || position > dsv->rows) {
+    /* insure position is in dsv, position will always be positive */
+    if (position > dsv->rows) {
         fprintf(stderr,"DSV_USR_ERR: position to try and insert row is out of bounds\n");
         return 1;
     }
@@ -300,7 +301,7 @@ int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position) {
     }
 
     for (size_t i = 0; i<dsv->cols; i++) {
-        row[i] = (char*)malloc(sizeof(char*)*max_size_of_string_in_tmp_row);
+        row[i] = (char*)malloc(sizeof(char*)*max_size_of_string_in_tmp_row+1);
         if (!row[i]) {
             fprintf(stderr, "DSV_ALLOC_ERR: Unable to allocate memory for row[%zu]\n", i);
             /* free old mem */
@@ -344,8 +345,8 @@ int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position) {
 
 int dsvRemoveRow(DSV *dsv, size_t position) {
 
-    /* insure position is in dsv */
-    if (position < 0 || position > dsv->rows) {
+    /* insure position is in dsv, position will always be positive */
+    if (position > dsv->rows) {
         fprintf(stderr,"DSV_USR_ERR: position to try and delete row is out of bounds\n");
         return 1;
     }
