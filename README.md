@@ -6,24 +6,24 @@ This is a header only library. Simpily include the headerfile and use!
 
 Look at the example main.c to see all the functionality.
 
-'''bash
+```bash
 git clone https://github.com/SherllyNeo/dsvParser.git &&
 cd dsvParser &&
 make &&
 ./bin/dsvParserExample
-'''
+```
 
 
 ### Features
 
-'''c
+```c
 typedef struct {
     char*** content;
     size_t rows;
     size_t cols;
     bool valid;
 } DSV;
-'''
+```
 
 
 
@@ -40,41 +40,41 @@ typedef struct {
 
 ### Functions
 
-'''c
+```c
 DSV dsvParseFile(char* filepath, char delim);
-'''
+```
 
-'''c
+```c
 int dsvWriteFile(DSV parsed,char* filepath,char delim);
-'''
+```
 
 
-'''c
+```c
 int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position);
-'''
+```
 
-'''c
+```c
 int dsvRemoveRow(DSV *dsv, size_t position);
-'''
+```
 
-'''c
+```c
 void dsvPrintDSV(DSV parsed);
-'''
+```
 
-'''c
+```c
 void dsvFreeDSV(DSV parsed);
-'''
+```
 
 
 you can also access elements directly like so (example printing)
-'''c
+```c
 for (size_t i = 0; i<parsed_csv.rows; i++) {
     for (size_t j = 0; j<parsed_csv.cols; j++) {
         printf("%s ",parsed_csv.content[i][j]);
     }
     printf("\n");
 }
-'''
+```
 
 
 
