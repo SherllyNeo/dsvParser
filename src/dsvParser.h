@@ -277,6 +277,8 @@ DSV parse_source(char* source, size_t size, char delim) {
     returnVal.rows = x;
     returnVal.cols = cols + 1;
 
+    free(source);
+
     return returnVal;
 }
 
@@ -415,6 +417,7 @@ DSV dsvParseFile(char* filepath, char delim) {
         exit(ERR_FILE);
     }
 
+    /* this function frees source */
     returnVal = parse_source(source,size,delim);
     if (!returnVal.valid || returnVal.rows == 0 || returnVal.cols == 0) {
         fprintf(stderr, "DSV_FILE_ERR: failed to read %s\n",filepath);
