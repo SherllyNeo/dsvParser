@@ -22,7 +22,6 @@ char* read_source(char* filepath,size_t* size) {
     size_t end = ftell(fp);
     rewind(fp);
 
-    
     char* source = (char*)malloc(end+1);
 
     if (!source) {
@@ -31,6 +30,11 @@ char* read_source(char* filepath,size_t* size) {
         return NULL;
     }
 
+    if (end <= 0) {
+        fprintf(stderr, "DSV_FILE_ERR: Failed to find lenth of file content %s\n",filepath);
+        fclose(fp);
+        return NULL;
+    }
 
     fread(source, 1, end, fp);
     fclose(fp);
