@@ -289,7 +289,7 @@ int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position) {
 
     /* insure position is in dsv, position will always be positive */
     if (position > dsv->rows) {
-        fprintf(stderr,"DSV_USR_ERR: position to try and insert row is out of bounds\n");
+        fprintf(stderr,"DSV_USR_ERR: position to try and insert row (%zu) is out of bounds (MAX: %zu)\n",position,dsv->rows);
         return 1;
     }
 
@@ -347,9 +347,10 @@ int dsvRemoveRow(DSV *dsv, size_t position) {
 
     /* insure position is in dsv, position will always be positive */
     if (position > dsv->rows) {
-        fprintf(stderr,"DSV_USR_ERR: position to try and delete row is out of bounds\n");
+        fprintf(stderr,"DSV_USR_ERR: position to try and insert row (%zu) is out of bounds (MAX: %zu)\n",position,dsv->rows);
         return 1;
     }
+
      /* Free memory for the row being removed */
     for (size_t i = 0; i < dsv->cols; i++) {
         free(dsv->content[position][i]);
@@ -415,10 +416,11 @@ DSV dsvParseFile(char* filepath, char delim) {
     }
 
     returnVal = parse_source(source,size,delim);
-    if (!returnVal.valid) {
+    if (!returnVal.valid || returnVal.rows == 0 || returnVal.cols == 0) {
         fprintf(stderr, "DSV_FILE_ERR: failed to read %s\n",filepath);
         return returnVal;
     }
+
     return returnVal;
 }
 
