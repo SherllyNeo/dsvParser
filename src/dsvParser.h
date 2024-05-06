@@ -447,6 +447,8 @@ int dsvWriteFile(DSV parsed,char* filepath,char delim) {
         fprintf(fp,"\n");
     }
 
+    fclose(fp);
+
     return 0;
 }
 
