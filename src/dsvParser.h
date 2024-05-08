@@ -95,8 +95,13 @@ char*** allocateContents(size_t rows, size_t cols, size_t strings_len) {
 size_t max_string_length(char** strings) {
     /* helper function to find the max size to allocate in an array */
     size_t max_length = 0;
+    size_t max_iter = 100;
 
     for (size_t i = 0; strings[i] != NULL; i++) {
+        if (i >= max_iter) {
+            fprintf(stderr, "DSV_USER_ERR: Ran for a %zu iterations without finding null termination in max_string_length... exiting\n",max_iter);
+            break;
+        }
         size_t length = strlen(strings[i]);
         if (length > max_length) {
             max_length = length;
