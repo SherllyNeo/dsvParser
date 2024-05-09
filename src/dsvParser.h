@@ -202,9 +202,9 @@ DSV parse_source(char* source, size_t size, char delim) {
     /* the most useful function, reads in a CSV and parses it */
 
     /* assumptions of typical csv sizes */
-    size_t rows_est = 100;
+    size_t rows_est = 5000;
     size_t cols_est = 10;
-    size_t strings_len_est = 200;
+    size_t strings_len_est = 1000;
     DSV returnVal = { NULL, 0, 0, false };
 
     returnVal.content = allocateContents(rows_est, cols_est, strings_len_est);
