@@ -30,7 +30,7 @@ typedef struct {
 * The struct can be checked to see if it is valid after each operation
 * Read delim seperated value file into a DSV struct (
 * Escapes inner deliminators with "", for example one,"tw,o",three will be parsed correctly
-* Supports '\\' escaping, so \, will not start a newline in a csv for example
+* Supports '\\' escaping, so '\\,' will not start a newline in a csv for example
 * Write DSV to a file with a customer deliminator which allows for escaping
 * Loop through each element of the array using the rows and cols to do with what you like
 * Insert row
