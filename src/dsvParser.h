@@ -203,7 +203,7 @@ DSV parse_source(char* source, size_t size, char delim) {
 
     /* assumptions of typical csv sizes */
     size_t rows_est = 5000;
-    size_t cols_est = 10;
+    size_t cols_est = 100;
     size_t strings_len_est = 1000;
     DSV returnVal = { NULL, 0, 0, false };
 
@@ -255,8 +255,12 @@ DSV parse_source(char* source, size_t size, char delim) {
         /* Grab current character */
         char current_char = source[i];
 
+        /* check if we need to add the next character literally, if it the next character exists " */
+        if (current_char == '\\' && (i < (size - 1))) {
+            returnVal.content[x][y][cur++] = source[++i];
+        }
         /* toggle escaping if we see " */
-        if (current_char == '"') {
+        else if (current_char == '"') {
             escaping = !escaping;
         }
         /* only parse below if we are not escaping */
@@ -275,8 +279,7 @@ DSV parse_source(char* source, size_t size, char delim) {
             cur = 0;
         } else {
             /* add to cell */
-            returnVal.content[x][y][cur] = current_char;
-            cur++;
+            returnVal.content[x][y][cur++] = current_char;
         }
     }
 
