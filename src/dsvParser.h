@@ -2,7 +2,6 @@
 
 #define PARSER
 
-
 #define ERR_FILE 10
 
 #include <stdio.h>
@@ -336,8 +335,17 @@ int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position) {
 
 
 
+    /* Find the largest string out of all rows */
     size_t max_size_of_string_in_new_row = max_string_length(row);
-    char*** tmp = reallocContents(dsv->content, dsv->rows, dsv->cols, dsv->rows+1, dsv->cols,max_size_of_string_in_new_row);
+    size_t max_size_of_string_in_dsv = max_size_of_string_in_new_row;
+    for (size_t j = 0; j<dsv->rows; j++) {
+        size_t max_of_cur_row = max_string_length(dsv->content[j]);
+        if (max_of_cur_row > max_size_of_string_in_dsv) {
+            max_size_of_string_in_dsv = max_of_cur_row;
+        }
+    }
+
+    char*** tmp = reallocContents(dsv->content, dsv->rows, dsv->cols, dsv->rows+1, dsv->cols,max_size_of_string_in_dsv);
     if (!tmp) {
         fprintf(stderr, "DSV_ALLOC_ERR: Unable to reallocate memory for rows\n");
         dsv->valid = false;

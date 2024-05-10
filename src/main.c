@@ -74,7 +74,7 @@ int main()
         }
         printf("\n");
     }
-    
+
     /* always free */
     int freed = dsvFreeDSV(parsed_csv);
     if (freed) {

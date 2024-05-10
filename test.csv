@@ -1,3 +1,4 @@
 column1,column2,column3,col4
 hey!,"testing comm,a escapes",te,st
 interesting!,"testi\'ng slash \\ "\, ,1,2
+supports huge lines!,"aabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzbcdefghijklmnopqrstuvwxyz",1,2
