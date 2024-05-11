@@ -1,4 +1,4 @@
-CFLAGS = -g3 -O -Wall -W -pedantic -lncurses
+CFLAGS = -g3 -O -Wall -W -pedantic 
 
 dsvParserExample src/main.c:
 	mkdir -p bin

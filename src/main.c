@@ -27,10 +27,10 @@ int main()
     }
 
     /* insert a row - must be malloc'd so the row can be freed later. strdup will malloc for us. 
-     * Be careful, here we insert 5 into a csv of width 4, the insert function will get rid of element 5 "five" and turn the excess elements to null (and null terminate), 
-     * effectively silently trunacting and MUST be a null terminated array */
+     * ensure correct length and null terminated
+     */
 
-     char** row = (char**)malloc(sizeof(char*) * 4);
+    char** row = (char**)malloc(sizeof(char*) * 5);
     if (!row) {
         fprintf(stderr, "ERROR: Unable to allocate memory for row\n");
         return 1;
@@ -39,7 +39,7 @@ int main()
     row[1] = strdup("two");
     row[2] = strdup("three");
     row[3] = strdup("four");
-    row[4] = strdup("five");
+    row[4] = strdup("four");
     row[5] = NULL;
     
     size_t insert_index = 1; /* ensure not out of bounds */

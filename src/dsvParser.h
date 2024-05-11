@@ -299,6 +299,14 @@ DSV parse_source(char* source, size_t size, char delim) {
 int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position) {
 
     size_t max_size_of_string_in_tmp_row = max_string_length(tmp_row);
+    size_t length = 0;
+    int max_iter = 100000;
+    for (int n = 0; tmp_row[n] != NULL; n++) {
+        if (n > max_iter) {
+            fprintf(stderr, "DSV_ALLOC_ERR: Unable to measure tmp row past [%d]\n", n);
+        }
+        length++;
+    }
 
     /* insure position is in dsv, position will always be positive */
     if (position > dsv->rows) {
@@ -328,12 +336,19 @@ int dsvInsertRow(DSV *dsv, char** tmp_row, size_t position) {
         row[i][max_size_of_string_in_tmp_row] = '\0';
     }
 
+    /* free all memory from tmp row */
+    for (int n = (int)dsv->cols; n < (int)length; n++) {
+        if (n > max_iter) {
+            fprintf(stderr, "DSV_ALLOC_ERR: Unable to free memory for value [%d]\n", n);
+        }
+        if (tmp_row[n]) {
+            free(tmp_row[n]);
+        }
+    }
     free(tmp_row);
 
     /* null terminate new */
     row[dsv->cols] = NULL;
-
-
 
     /* Find the largest string out of all rows */
     size_t max_size_of_string_in_new_row = max_string_length(row);
@@ -369,7 +384,7 @@ int dsvRemoveRow(DSV *dsv, size_t position) {
 
     /* insure position is in dsv, position will always be positive */
     if (position > dsv->rows) {
-        fprintf(stderr,"DSV_USR_ERR: position to try and insert row (%zu) is out of bounds (MAX: %zu)\n",position,dsv->rows);
+        fprintf(stderr,"DSV_USR_ERR: position to try and delete row (%zu) is out of bounds (MAX: %zu)\n",position,dsv->rows);
         return 1;
     }
 
